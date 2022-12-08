@@ -8,17 +8,13 @@ extern "C"
 
 #include <intrin.h>
 
-
 }
 #endif // __cplusplus
 
-
-
-
 #include "Class.h"
 
-// "NtWriteFile"
 
+// "NtWriteFile"
 DWORD64 
 GetFunctionAddress::GetFunctionSSDTAddressByName(
 	_In_	PDRIVER_OBJECT	pDriverObject,
@@ -38,9 +34,7 @@ GetFunctionAddress::GetFunctionSSDTAddressByName(
 	DWORD64 apiAddress = (DWORD64)ssdtStart + (DWORD64)(ssdtStart[id] >> 4);
 
 	return apiAddress;
-
 }
-
 
 
 ULONG_PTR 
@@ -58,9 +52,7 @@ GetFunctionAddress::GetSSDTPtr(
 		return uret;
 	}
 
-
 	//KdPrint(("kernel base:--<%p>-- kernelbase size:--<%x>--\n", kernelbase, kernelSize));
-
 
 	BYTE KiSystemServiceStartPattern[] = { 0x8b,0xf8,0xc1,0xef,0x07,0x83,0xe7,0x20,0x25,0xff,0x0f,0x00,0x00 };
 
@@ -86,16 +78,15 @@ GetFunctionAddress::GetSSDTPtr(
 	}
 
 	//
-	//	ÕâÀï¾ÍÊÇ lea r10£¬KeServiceDescriptorTable
+	//	è¿™é‡Œå°±æ˜¯ lea r10ï¼ŒKeServiceDescriptorTable
 	//
-
 	PUCHAR address = kernelbase + KiSSSOffset + signatureSize;
 
 	LONG jmpoffset = 0;
 
 	if (*(address) == 0x4c && *(address + 1) == 0x8d && *(address + 2) == 0x15)
 	{
-		jmpoffset = *(PLONG)(address + 3); //	lea r10£¬KeServiceDescriptorTable
+		jmpoffset = *(PLONG)(address + 3); //	lea r10ï¼ŒKeServiceDescriptorTable
 	}
 
 	if (!jmpoffset)
@@ -106,15 +97,10 @@ GetFunctionAddress::GetSSDTPtr(
 	uret = (ULONG_PTR)(address + jmpoffset + 7);
 
 	return uret;
-
 }
 
 
-
-
-
-ULONG_PTR		
-GetFunctionAddress::GetKernelModuleBase(
+ULONG_PTR GetFunctionAddress::GetKernelModuleBase(
 	PDRIVER_OBJECT pDriver,
 	PULONG pimagesize, 
 	PWCHAR modulename
@@ -154,20 +140,11 @@ GetFunctionAddress::GetKernelModuleBase(
 		KdPrint(("Error Get ntoskrnl.exe"));
 		return uret;
 	}
-
 	return uret;
-
 }
 
 
-
-
-
-
-
-
-ULONG 
-GetFunctionAddress::GetSSDTFunctionIndex(
+ULONG GetFunctionAddress::GetSSDTFunctionIndex(
 	PCCHAR funname
 )
 {
@@ -206,13 +183,7 @@ GetFunctionAddress::GetSSDTFunctionIndex(
 }
 
 
-
-
-
-
-
-PVOID 
-GetFunctionAddress::KernelLoadDllLibrary(
+PVOID GetFunctionAddress::KernelLoadDllLibrary(
 	const wchar_t* full_dll_path
 )
 {
@@ -301,17 +272,10 @@ GetFunctionAddress::KernelLoadDllLibrary(
 }
 
 
-
-
-
-
-//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤
-//	ÄÚºËÖĞ×°ÔØ ntoskrnl.exe ºó£¬Í¨¹ıº¯ÊıÃû³Æ£¬ºÍ ntoskrnl   µÄµØÖ·²éÕÒº¯ÊıµÄµØÖ·
-//¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤¡¤
-
-
-PVOID 
-GetFunctionAddress::GetModuleExport(
+//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·
+//	å†…æ ¸ä¸­è£…è½½ ntoskrnl.exe åï¼Œé€šè¿‡å‡½æ•°åç§°ï¼Œå’Œ ntoskrnl   çš„åœ°å€æŸ¥æ‰¾å‡½æ•°çš„åœ°å€
+//Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·Â·
+PVOID GetFunctionAddress::GetModuleExport(
 	IN PVOID pBase, 
 	IN PCCHAR name_ord
 )
@@ -419,10 +383,6 @@ GetFunctionAddress::GetModuleExport(
 }
 
 
-
-
-
-
 _IRQL_requires_max_(DISPATCH_LEVEL)
 void* __cdecl operator new(size_t size) {
 	if (size == 0) {
@@ -439,11 +399,3 @@ void __cdecl operator delete(void* p, SIZE_T size) {
 		ExFreePoolWithTag(p, 'delC');
 	}
 }
-
-
-
-
-
-
-
-
