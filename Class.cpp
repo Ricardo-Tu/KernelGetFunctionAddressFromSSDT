@@ -15,14 +15,11 @@ extern "C"
 
 
 // "NtWriteFile"
-DWORD64 
-GetFunctionAddress::GetFunctionSSDTAddressByName(
+DWORD64 GetFunctionAddress::GetFunctionSSDTAddressByName(
 	_In_	PDRIVER_OBJECT	pDriverObject,
 	_In_	PCHAR	szApiName
 )
 {
-
-
 	PServiceDescriptorTableEntry64 ssdt_Address = (PServiceDescriptorTableEntry64)GetSSDTPtr(pDriverObject);
 
 	ULONG id = GetSSDTFunctionIndex(szApiName);
@@ -37,8 +34,7 @@ GetFunctionAddress::GetFunctionSSDTAddressByName(
 }
 
 
-ULONG_PTR 
-GetFunctionAddress::GetSSDTPtr(
+ULONG_PTR GetFunctionAddress::GetSSDTPtr(
 	PDRIVER_OBJECT pDriver
 )
 {
@@ -48,9 +44,7 @@ GetFunctionAddress::GetSSDTPtr(
 
 	kernelbase = (PUCHAR)GetKernelModuleBase(pDriver, &kernelSize, L"ntoskrnl.exe");
 	if (!kernelbase)
-	{
 		return uret;
-	}
 
 	//KdPrint(("kernel base:--<%p>-- kernelbase size:--<%x>--\n", kernelbase, kernelSize));
 
@@ -63,19 +57,14 @@ GetFunctionAddress::GetSSDTPtr(
 	BOOLEAN bfound = FALSE;
 
 	for (KiSSSOffset = 0; KiSSSOffset < kernelSize - signatureSize; KiSSSOffset++)
-	{
 		if (RtlCompareMemory((kernelbase + KiSSSOffset), KiSystemServiceStartPattern, signatureSize) == signatureSize)
 		{
 			bfound = TRUE;
 			break;
 		}
 
-	}
-
 	if (!bfound)
-	{
 		return uret;
-	}
 
 	//
 	//	这里就是 lea r10，KeServiceDescriptorTable
@@ -85,14 +74,10 @@ GetFunctionAddress::GetSSDTPtr(
 	LONG jmpoffset = 0;
 
 	if (*(address) == 0x4c && *(address + 1) == 0x8d && *(address + 2) == 0x15)
-	{
 		jmpoffset = *(PLONG)(address + 3); //	lea r10，KeServiceDescriptorTable
-	}
 
 	if (!jmpoffset)
-	{
 		return uret;
-	}
 
 	uret = (ULONG_PTR)(address + jmpoffset + 7);
 
@@ -107,8 +92,11 @@ ULONG_PTR GetFunctionAddress::GetKernelModuleBase(
 )
 {
 	UNICODE_STRING kernelname = { 0 };
+	
 	ULONG_PTR uret = 0;
+	
 	PLDR_DATA_TABLE_ENTRY64 pentry = (PLDR_DATA_TABLE_ENTRY64)pDriver->DriverSection;
+	
 	PLDR_DATA_TABLE_ENTRY64 first = NULL;
 
 	RtlInitUnicodeString(&kernelname, modulename);
@@ -127,8 +115,6 @@ ULONG_PTR GetFunctionAddress::GetKernelModuleBase(
 						*pimagesize = pentry->SizeOfImage;
 					}
 					break;
-
-
 				}
 				pentry = (PLDR_DATA_TABLE_ENTRY64)pentry->InLoadOrderLinks.Blink;
 			}
@@ -138,6 +124,7 @@ ULONG_PTR GetFunctionAddress::GetKernelModuleBase(
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
 		KdPrint(("Error Get ntoskrnl.exe"));
+		
 		return uret;
 	}
 	return uret;
@@ -179,7 +166,6 @@ ULONG GetFunctionAddress::GetSSDTFunctionIndex(
 	ZwUnmapViewOfSection(NtCurrentProcess(), ntdll);
 
 	return funaddrid;
-
 }
 
 
@@ -187,8 +173,6 @@ PVOID GetFunctionAddress::KernelLoadDllLibrary(
 	const wchar_t* full_dll_path
 )
 {
-
-
 	HANDLE hSection = NULL, hFile = NULL;
 
 	UNICODE_STRING dllName = { 0 };
@@ -204,9 +188,7 @@ PVOID GetFunctionAddress::KernelLoadDllLibrary(
 	IO_STATUS_BLOCK iosb = { 0 };
 
 	RtlInitUnicodeString(&dllName, full_dll_path);
-
-
-
+	
 	stat = ZwOpenFile(
 			&hFile, 
 			FILE_EXECUTE | SYNCHRONIZE, 
@@ -302,38 +284,33 @@ PVOID GetFunctionAddress::GetModuleExport(
 
 	ASSERT(pBase != NULL);
 	if (pBase == NULL)
-	{
 		return NULL;
-	}
 
 	// Not a PE filebuf
-
 	if (pDosHdr->e_magic != IMAGE_DOS_SIGNATURE)
-	{
 		return NULL;
-	}
 
 	pNtHdr32 = (PIMAGE_NT_HEADERS32)((PUCHAR)pBase + pDosHdr->e_lfanew);
+	
 	pNtHdr64 = (PIMAGE_NT_HEADERS64)((PUCHAR)pBase + pDosHdr->e_lfanew);
 
 	// Not a PE filebuf
 
 	if (pNtHdr32->Signature != IMAGE_NT_SIGNATURE)
-	{
 		return NULL;
-	}
 
 	// 64 bit image
-
 	if (pNtHdr32->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
 	{
 		pExport = (PIMAGE_EXPORT_DIRECTORY)(pNtHdr64->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress + (ULONG_PTR)pBase);
+		
 		expSize = pNtHdr64->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
 	}
 	// 32 Bibt image
 	else
 	{
 		pExport = (PIMAGE_EXPORT_DIRECTORY)(pNtHdr32->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress + (ULONG_PTR)pBase);
+		
 		expSize = pNtHdr32->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
 	}
 
@@ -374,12 +351,8 @@ PVOID GetFunctionAddress::GetModuleExport(
 			}
 			break;
 		}
-
 	}
-
 	return (PVOID)pAddress;
-
-
 }
 
 
