@@ -12,33 +12,21 @@ extern "C"
 }
 #endif // __cplusplus
 
-
-
-
 #include "Class.h"
-
-
 
 
 VOID	UnloadMyDriver(
 	_In_ PDRIVER_OBJECT	pDriverObject
 )
 {
-
 	KdPrint(("My Driver:Unload...\n"));
-	
 }
 
-
-
-extern "C"
-NTSTATUS	
-DriverEntry(
+extern "C" NTSTATUS DriverEntry(
 	_In_	PDRIVER_OBJECT	pDriverObject,
 	_In_	PUNICODE_STRING	pRegistryPath
 )
 {
-
 	GetFunctionAddress* MyClass;
 
 	MyClass = new	GetFunctionAddress;
@@ -49,25 +37,5 @@ DriverEntry(
 
 	pDriverObject->DriverUnload = UnloadMyDriver;
 
-
 	return STATUS_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
