@@ -1,98 +1,55 @@
 #pragma once
 
-
-
-
-
 class GetFunctionAddress
 {
 public:
     GetFunctionAddress()
     {
-
     }
     ~GetFunctionAddress()
     {
-
     }
-
 
     DWORD64
         GetFunctionSSDTAddressByName(
-            _In_	PDRIVER_OBJECT	pDriverObject,
-            _In_	PCHAR	szApiName
+            _In_ PDRIVER_OBJECT	pDriverObject,
+            _In_ PCHAR	szApiName
         );
 
-
-
 private:
-
-
-    ULONG_PTR
-        GetSSDTPtr(
+    ULONG_PTR GetSSDTPtr(
             PDRIVER_OBJECT pDriver
         );
     
-    ULONG_PTR
-        GetKernelModuleBase(
+    ULONG_PTR GetKernelModuleBase(
             PDRIVER_OBJECT pDriver,
             PULONG pimagesize,
             PWCHAR modulename
         );
 
-    PVOID
-        KernelLoadDllLibrary(
+    PVOID KernelLoadDllLibrary(
             const wchar_t* full_dll_path
         );
 
-    ULONG
-        GetSSDTFunctionIndex(
+    ULONG GetSSDTFunctionIndex(
             PCCHAR funname
         );
 
-    PVOID
-        GetModuleExport(
+    PVOID GetModuleExport(
             IN PVOID pBase,
             IN PCCHAR name_ord
         );
-
 };
 
 
+_IRQL_requires_max_(DISPATCH_LEVEL) void* __cdecl operator new(
+    size_t size
+    );
 
-
-_IRQL_requires_max_(DISPATCH_LEVEL)
-void* __cdecl operator new(size_t size);
-
-_IRQL_requires_max_(DISPATCH_LEVEL)
-void __cdecl operator delete(void* p, SIZE_T size);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+_IRQL_requires_max_(DISPATCH_LEVEL) void __cdecl operator delete(
+    void* p,
+    SIZE_T size
+    );
 
 
 typedef struct _LDR_DATA_TABLE_ENTRY64
@@ -134,9 +91,6 @@ typedef struct ServiceDescriptorEntry64 {
 } ServiceDescriptorTableEntry64, * PServiceDescriptorTableEntry64;
 
 
-
-
-
 /*
 * 
 * 
@@ -160,33 +114,12 @@ typedef struct ServiceDescriptorEntry64 {
 *                   P                                   E
 *                   P                                   E
 *                   P                                   EEEEEEEEEEEEEEEEEEEEE
-*                   
-*                   
+*                                
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //
 // Image Format
 //
-
-
 #ifndef _MAC
 
 #include "pshpack4.h"                   // 4 byte packing is the default
